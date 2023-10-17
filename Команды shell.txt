@@ -1,0 +1,46 @@
+from django.contrib.auth.models import User
+user1 = User.objects.create_user('user1')
+user2 = User.objects.create_user('user2')
+
+from News_Project.models import Author
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+from News_Project.models import Category
+category1 = Category.objects.create(name='Category 1')
+category2 = Category.objects.create(name='Category 2')
+category3 = Category.objects.create(name='Category 3')
+category4 = Category.objects.create(name='Category 4')
+
+from News_Project.models import Post, PostCategory
+post1 = Post.objects.create(author=author1, post_type='article', title='Post 1', text='Text for post 1', rating=0)
+post2 = Post.objects.create(author=author2, post_type='article', title='Post 2', text='Text for post 2', rating=0)
+news1 = Post.objects.create(author=author1, post_type='news', title='News 1', text='Text for news 1', rating=0)
+
+post_category1 = PostCategory.objects.create(post=post1, category=category1)
+post_category2 = PostCategory.objects.create(post=post1, category=category2)
+post_category3 = PostCategory.objects.create(post=post2, category=category3)
+post_category4 = PostCategory.objects.create(post=news1, category=category4)
+
+from News_Project.models import Comment
+comment1 = Comment.objects.create(post=post1, user=user1, text='Comment 1 for post 1', rating=0)
+comment2 = Comment.objects.create(post=post2, user=user2, text='Comment 1 for post 2', rating=0)
+comment3 = Comment.objects.create(post=post2, user=user1, text='Comment 2 for post 2', rating=0)
+comment4 = Comment.objects.create(post=news1, user=user2, text='Comment for news 1', rating=0)
+
+post1.like()
+post2.dislike()
+comment1.like()
+comment2.dislike()
+
+author1.update_rating()
+author2.update_rating()
+
+best_author = Author.objects.all().order_by('-rating').first()
+print(best_author.user.username, best_author.rating)
+
+best_post = Post.objects.filter(post_type='article').order_by('-rating').first()
+print(best_post.created_at, best_post.author.user.username, best_post.rating, best_post.title, best_post.preview())
+
+for comment in best_post.comments.all():
+    print(comment.created_at, comment.user.username, comment.rating, comment.text)
